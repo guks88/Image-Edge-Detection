@@ -51,14 +51,22 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="EdgeDetectTest.cs" />
     <Compile Include="ImageFilterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitTestEdgeDetectionLaplacianGaussian.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ImageEdgeDetection\ImageEdgeDetection.csproj">
       <Project>{7dbee0d3-2dbd-4e8a-ba07-bdb1c95eb366}</Project>
       <Name>ImageEdgeDetection</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="base.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="LaplacianGaussian.png" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
