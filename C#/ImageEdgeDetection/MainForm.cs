@@ -21,7 +21,9 @@ namespace ImageEdgeDetection
         private Bitmap originalBitmap = null;
         private Bitmap previewBitmap = null;
         private Bitmap resultBitmap = null;
-        
+        //Add an intermediate image to save the state after the filter and to pass it to the edge detection
+        private Bitmap intermediateBitmap = null;
+
         public MainForm()
         {
             InitializeComponent();
@@ -29,6 +31,8 @@ namespace ImageEdgeDetection
             cmbEdgeDetection.SelectedIndex = 0;
             cmbFilter.SelectedIndex = 0;
             btnOpenOriginal_Click(null,null);
+            //The image can't be saved at the beginning
+            btnSaveNewImage.Enabled = false;
         }
 
         private void btnOpenOriginal_Click(object sender, EventArgs e)
@@ -46,13 +50,17 @@ namespace ImageEdgeDetection
 
                 previewBitmap = originalBitmap.CopyToSquareCanvas(picPreview.Width);
                 picPreview.Image = previewBitmap;
+                
+                //Only the filters are available at the beginning
+                cmbEdgeDetection.Enabled = false;
+                cmbFilter.Enabled = true;
 
-                ApplyEdgeDetect(true);
             }
         }
 
         private void btnSaveNewImage_Click(object sender, EventArgs e)
         {
+
             ApplyEdgeDetect(false);
 
             if (resultBitmap != null)
@@ -77,7 +85,9 @@ namespace ImageEdgeDetection
                     }
 
                     StreamWriter streamWriter = new StreamWriter(sfd.FileName, false);
-                    resultBitmap.Save(streamWriter.BaseStream, imgFormat);
+                    //Line added to avoid an error : http://stackoverflow.com/questions/15571022/how-to-find-reason-for-generic-gdi-error-when-saving-an-image
+                    Bitmap savedImage = new Bitmap(resultBitmap);
+                    savedImage.Save(streamWriter.BaseStream, imgFormat);
                     streamWriter.Flush();
                     streamWriter.Close();
 
@@ -85,9 +95,13 @@ namespace ImageEdgeDetection
                 }
             }
         }
-        private void ApplyFilter(bool preview)
+
+        //Method simplified, because once a filter is applied the filters are disabled 
+        private void ApplyFilter()
         {
-            if (previewBitmap == null || cmbEdgeDetection.SelectedIndex == -1)
+            
+            //cmbFilter instead of cmbEdgeDetection
+            if (previewBitmap == null || cmbFilter.SelectedIndex == -1)
             {
                 return;
             }
@@ -95,14 +109,9 @@ namespace ImageEdgeDetection
             Bitmap selectedSource = null;
             Bitmap bitmapResult = null;
 
-            if (preview == true)
-            {
-                selectedSource = previewBitmap;
-            }
-            else
-            {
+            
                 selectedSource = originalBitmap;
-            }
+           
 
             if (selectedSource != null)
             {
@@ -111,19 +120,28 @@ namespace ImageEdgeDetection
 
             if (bitmapResult != null)
             {
-                if (preview == true)
-                {
+               
                     picPreview.Image = bitmapResult;
-                }
-                else
-                {
-                    resultBitmap = bitmapResult;
-                }
+                    intermediateBitmap = bitmapResult;
+               
             }
+
+            //Disabling the filters and enabling the edge detection
+            cmbEdgeDetection.Enabled = true;
+            cmbFilter.Enabled = false;
+
+            //From here, saving the image is possible, not loading a new one 
+            btnSaveNewImage.Enabled = true;
+            btnOpenOriginal.Enabled = false;
+
+
+
         }
 
         private void ApplyEdgeDetect(bool preview)
         {
+            
+
             if (previewBitmap == null || cmbEdgeDetection.SelectedIndex == -1)
             {
                 return;
@@ -132,13 +150,14 @@ namespace ImageEdgeDetection
             Bitmap selectedSource = null;
             Bitmap bitmapResult = null;
 
+            //We work we the intermediateBitmap coming from the filter
             if (preview == true)
             {
-                selectedSource = previewBitmap;
+                selectedSource = intermediateBitmap;
             }
             else
             {
-                selectedSource = originalBitmap;
+                selectedSource = intermediateBitmap;
             }
 
             if (selectedSource != null)
@@ -232,7 +251,7 @@ namespace ImageEdgeDetection
 
         private void ChooseFilterEventHandler(object sender, EventArgs e)
         {
-            ApplyFilter(true);
+            ApplyFilter();
         }
         private void NeighbourCountValueChangedEventHandler(object sender, EventArgs e)
         {

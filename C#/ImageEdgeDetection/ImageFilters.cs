@@ -69,19 +69,22 @@ namespace ImageEdgeDetection
         }
 
         //black and white filter
-        public static Bitmap BlackWhite(Bitmap Bmp)
+        /*Modified by Zappellaz Nancy & Mabillard Julien: We had to change this method because it was returning bmp(so the original image was permanently changed) instead of temp , 
+        moreover the variable was written with a capital letter...*/
+        public static Bitmap BlackWhite(Bitmap bmp)
         {
+            Bitmap temp = new Bitmap(bmp.Width, bmp.Height);
             int rgb;
             Color c;
 
-            for (int y = 0; y < Bmp.Height; y++)
-                for (int x = 0; x < Bmp.Width; x++)
+            for (int y = 0; y < bmp.Height; y++)
+                for (int x = 0; x < bmp.Width; x++)
                 {
-                    c = Bmp.GetPixel(x, y);
+                    c = bmp.GetPixel(x, y);
                     rgb = (int)((c.R + c.G + c.B) / 3);
-                    Bmp.SetPixel(x, y, Color.FromArgb(rgb, rgb, rgb));
+                    temp.SetPixel(x, y, Color.FromArgb(rgb, rgb, rgb));
                 }
-            return Bmp;
+            return temp;
 
         }
 
