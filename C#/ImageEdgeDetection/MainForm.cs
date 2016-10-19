@@ -150,7 +150,7 @@ namespace ImageEdgeDetection
             Bitmap selectedSource = null;
             Bitmap bitmapResult = null;
 
-            //We work we the intermediateBitmap coming from the filter
+            //We work with the intermediateBitmap coming from the filter
             if (preview == true)
             {
                 selectedSource = intermediateBitmap;
